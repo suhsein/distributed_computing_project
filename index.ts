@@ -11,11 +11,12 @@ import { promises as fs } from 'fs';
 //비동기적 파일 시스템 사용을 위해서 'fs'의 promises API를 import함. fs라는 이름으로 사용.
 
 const textract = new AWS.Textract(); //aws-sdk의 Textract()함수를 textract라는 상수로 사용.
+const translate = new AWS.Translate();
 
 const main = async () => { //메인함수 화살표 함수 표현. 비동기 함수의 동기식 처리를 위해 async로.
     try {
         //read the image
-        const buf = await fs.readFile('receipt.png'); //상수 buf에 이미지를 비동기적으로 읽어서 넣음.
+        const buf = await fs.readFile('internationallovesong.PNG'); //상수 buf에 이미지를 비동기적으로 읽어서 넣음.
         //readFile의 인자로 이미지 경로를 넣어줌. 리턴값은 <Buffer>객체 프로미스이다.
         //Buffer는 원시 이진 데이터를 처리하도록 설계된 인스턴스이다. Blob=Binary large object.
 
@@ -34,7 +35,18 @@ const main = async () => { //메인함수 화살표 함수 표현. 비동기 함
         // (filter 함수는 각 요소들에서 조건을 만족하는 값만 걸러내 배열 생성. map 함수는 각 요소를 한번씩 불러서 반환값으로 배열 생성.)
         //최종적으로 걸러진 배열 요소들을 join 메소드를 통해 합치는데, 합치는 중간에 줄바꿈 문자를 넣음. LINE 단위로 줄바꿈 됨.
 
-       
+        const params = {
+            SourceLanguageCode: 'en',
+            TargetLanguageCode: 'ko',
+            Text : String(res.Blocks?.filter(i => i.BlockType === 'LINE').map(i => i.Text).join('\n'))
+            //파싱한 값 undefine | string 타입인데, Text 파라미터는 string 타입이어야 하므로 형변환.  
+        }
+        
+        const translated = await translate.translateText(params).promise();
+        
+        console.log(translated.TranslatedText);
+
+        /*
         const FS = require('fs');
         const text = {
             Text : res.Blocks?.filter(i => i.BlockType === 'LINE').map(i => i.Text).join('\n')
@@ -42,6 +54,7 @@ const main = async () => { //메인함수 화살표 함수 표현. 비동기 함
         
         const textjson = JSON.stringify(text);
         FS.writeFileSync('test-textjson.json', textjson);
+        */
 
     } catch(err){
         console.error(err); //에러 핸들링.
