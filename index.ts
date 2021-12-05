@@ -26,8 +26,22 @@ const main = async () => { //메인함수 화살표 함수 표현. 비동기 함
         //비동기적으로 실행되어서 프로미스값을 리턴하도록 하고, res에 담는다.
 
         //parse the result
-        console.log(res);
+        console.log(res.Blocks?.filter(i => i.BlockType === 'LINE').map(i => i.Text).join('\n'));
         //콘솔에 res를 출력.
+        //res의 blocks(response값으로 block들의 배열이다)에서 filter 메소드로 특정 값만을 걸러내 새로운 배열생성.
+        //새로운 배열의 요소는 BlockType이 'LINE'인 요소들.(추출된 blocks에서 줄단위로 구분되는 요소들이다.)
+        //걸러진 배열에서 map 메소드로 각 요소의 Text를 가져옴. 
+        // (filter 함수는 각 요소들에서 조건을 만족하는 값만 걸러내 배열 생성. map 함수는 각 요소를 한번씩 불러서 반환값으로 배열 생성.)
+        //최종적으로 걸러진 배열 요소들을 join 메소드를 통해 합치는데, 합치는 중간에 줄바꿈 문자를 넣음. LINE 단위로 줄바꿈 됨.
+
+       
+        const FS = require('fs');
+        const text = {
+            Text : res.Blocks?.filter(i => i.BlockType === 'LINE').map(i => i.Text).join('\n')
+        }
+        
+        const textjson = JSON.stringify(text);
+        FS.writeFileSync('test-textjson.json', textjson);
 
     } catch(err){
         console.error(err); //에러 핸들링.
