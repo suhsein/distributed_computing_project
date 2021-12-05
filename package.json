@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@types/node": "^16.11.11",
+    "aws-sdk": "^2.1042.0",
+    "type" : "module"
+  }
+}
